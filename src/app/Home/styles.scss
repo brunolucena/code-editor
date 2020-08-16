@@ -1,0 +1,13 @@
+.home-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  min-height: 100vh;
+
+  .file-tree-wrapper {
+    background-color: #252526;
+  }
+
+  .content-wrapper {
+    background-color: #1e1e1e;
+  }
+}

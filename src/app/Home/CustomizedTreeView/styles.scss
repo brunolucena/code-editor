@@ -1,0 +1,12 @@
+.MuiTreeView-root.treeview-wrapper {
+  padding: 10px 15px;
+  color: #73c991;
+
+  .svg-icon {
+    color: #c2b791;
+
+    &.close {
+      color: #ef5350;
+    }
+  }
+}
