@@ -64,9 +64,13 @@ async function Api(action: Action<any>, noAuth?: boolean) {
 
   if (method === 'POST') {
     return client.post(url, data, config);
+  } else if (method === 'GET') {
+    return client.get(url, { params: data });
+  } else if (method === 'PUT') {
+    return client.put(url, { params: data });
+  } else if (method === 'DELETE') {
+    return client.delete(url, { params: data });
   }
-
-  return client.get(url, { params: data });
 }
 
 export default Api;

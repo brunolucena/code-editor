@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import { withStyles } from '@material-ui/core/styles';
 import TreeView from '@material-ui/lab/TreeView';
-import TreeItem from '@material-ui/lab/TreeItem';
+import TreeItem, { TreeItemProps } from '@material-ui/lab/TreeItem';
 import Collapse, { CollapseProps } from '@material-ui/core/Collapse';
 import { useSpring, animated } from 'react-spring/web.cjs'; // web.cjs is required for IE 11 support
 
 import './styles.scss';
-import { useDispatch } from 'react-redux';
-import { getFileTree } from 'app/Store/Ducks/onlineEditorDuck';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFileTree, deleteFile, getFile, selectAllFileTreeIds } from 'app/Store/Ducks/onlineEditorDuck';
+import { ReduxStore } from 'app/Store';
+import { FileTreeItem } from 'app/Store/Ducks/onlineEditorDuck/models';
 
 function MinusSquare(props: any) {
   return (
@@ -69,37 +71,74 @@ const StyledTreeItem = withStyles((theme) => ({
     paddingLeft: 18,
     borderLeft: `1px dashed #585858`,
   },
-}))((props: any) => <TreeItem {...props} TransitionComponent={TransitionComponent} />);
+}))((props: TreeItemProps) => <TreeItem {...props} TransitionComponent={TransitionComponent} />);
 
+/**
+ * This is an example component by MaterialUI, adapted to load the FileTree.
+ * The source code can be found at MaterialUI: https://material-ui.com/components/tree-view/#customized-tree-view
+ *
+ * Author: Bruno Lucena
+ */
 function CustomizedTreeView() {
   const dispatch = useDispatch();
+  const { onlineEditor } = useSelector((state: ReduxStore) => state);
+
+  const { fileTree } = onlineEditor;
 
   useEffect(() => {
     dispatch(getFileTree());
   }, [dispatch]);
 
+  function renderFileTreeItem(ft: FileTreeItem, index: number) {
+    const { children, id, isDirectory, name } = ft;
+
+    /** Delete the file when delete icon is clicked */
+    function onIconClick() {
+      dispatch(deleteFile({ fileId: id }));
+    }
+
+    /** Loads the file when the name of the file is clicked */
+    function onLabelClick() {
+      dispatch(getFile({ fileId: id }));
+    }
+
+    if (isDirectory) {
+      // Doesn't render empty directories, because the Material component
+      // makes items without children to automatically becames a file.
+      // (This is a bug and must find another solution.) =]
+      if (children && children.length > 0) {
+        return (
+          <StyledTreeItem key={id + ' ' + index} nodeId={String(id)} label={name}>
+            {children?.map((c, index2) => {
+              return renderFileTreeItem(c, index + index2);
+            })}
+          </StyledTreeItem>
+        );
+      }
+    } else {
+      return (
+        <StyledTreeItem
+          key={id + ' ' + index}
+          nodeId={String(id) + String(index)}
+          label={name}
+          onIconClick={onIconClick}
+          onLabelClick={onLabelClick}
+        />
+      );
+    }
+  }
+
+  const allIds = selectAllFileTreeIds(onlineEditor);
+
   return (
     <TreeView
       className='treeview-wrapper'
-      defaultExpanded={['1']}
+      defaultExpanded={allIds}
       defaultCollapseIcon={<MinusSquare />}
       defaultExpandIcon={<PlusSquare />}
       defaultEndIcon={<CloseSquare />}
     >
-      <StyledTreeItem nodeId='1' label='Main'>
-        <StyledTreeItem nodeId='2' label='Hello' />
-        <StyledTreeItem nodeId='3' label='Subtree with children'>
-          <StyledTreeItem nodeId='6' label='Hello' />
-          <StyledTreeItem nodeId='7' label='Sub-subtree with children'>
-            <StyledTreeItem nodeId='9' label='Child 1' />
-            <StyledTreeItem nodeId='10' label='Child 2' />
-            <StyledTreeItem nodeId='11' label='Child 3' />
-          </StyledTreeItem>
-          <StyledTreeItem nodeId='8' label='Hello' />
-        </StyledTreeItem>
-        <StyledTreeItem nodeId='4' label='World' />
-        <StyledTreeItem nodeId='5' label='Something something' />
-      </StyledTreeItem>
+      {fileTree.map(renderFileTreeItem)}
     </TreeView>
   );
 }

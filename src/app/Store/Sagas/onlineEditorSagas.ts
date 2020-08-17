@@ -3,33 +3,40 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import Api from '../Services/Api';
 import { Action } from '../Models/ReduxModels';
 
-import { DeleteFileRequest, FileUpdateRequest, GetFileRequest } from '../Ducks/onlineEditorDuck/models';
 import {
   DELETE_FILE,
   DELETE_FILE_FAILURE,
   DELETE_FILE_SUCCESS,
+  DeleteFile,
+  DeleteFileSuccess,
   FILE_UPDATE,
   FILE_UPDATE_FAILURE,
   FILE_UPDATE_SUCCESS,
+  FileUpdate,
   GET_FILE,
   GET_FILETREE,
   GET_FILETREE_FAILURE,
   GET_FILETREE_SUCCESS,
   GET_FILE_FAILURE,
   GET_FILE_SUCCESS,
+  GetFile,
 } from '../Ducks/onlineEditorDuck';
 
-function* deleteFileSaga(action: Action<DeleteFileRequest>) {
+function* deleteFileSaga(action: DeleteFile) {
   try {
-    const payload = yield call(Api, action);
+    yield call(Api, action);
 
-    yield put({ type: DELETE_FILE_SUCCESS, payload });
+    const fileId = action.fileId || 99999999;
+
+    const actionSuccess: DeleteFileSuccess = { type: DELETE_FILE_SUCCESS, payload: { fileId } };
+
+    yield put(actionSuccess);
   } catch (e) {
     yield put({ type: DELETE_FILE_FAILURE, payload: e });
   }
 }
 
-function* fileUpdateSaga(action: Action<FileUpdateRequest>) {
+function* fileUpdateSaga(action: FileUpdate) {
   try {
     const payload = yield call(Api, action);
 
@@ -39,7 +46,7 @@ function* fileUpdateSaga(action: Action<FileUpdateRequest>) {
   }
 }
 
-function* getFileSaga(action: Action<GetFileRequest>) {
+function* getFileSaga(action: GetFile) {
   try {
     const payload = yield call(Api, action);
 

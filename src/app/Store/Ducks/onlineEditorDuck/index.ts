@@ -18,6 +18,7 @@ export const GET_FILETREE_FAILURE = 'GET_FILETREE_FAILURE';
 export const GET_FILETREE_SUCCESS = 'GET_FILETREE_SUCCESS';
 
 export interface DeleteFile {
+  fileId: number;
   type: typeof DELETE_FILE;
   payload: ActionPayload<{}>;
 }
@@ -27,6 +28,7 @@ export interface DeleteFileFailure {
 }
 export interface DeleteFileSuccess {
   type: typeof DELETE_FILE_SUCCESS;
+  payload: { fileId: number };
 }
 
 export interface FileUpdate {
@@ -116,10 +118,13 @@ export default function reducer(state = initialState, action: Actions): State {
       };
     }
     case DELETE_FILE_SUCCESS: {
+      const newFileTree = state.fileTree.map((ft) => filterFileTreeItemById(ft, action.payload.fileId));
+
       return {
         ...state,
         loading: false,
         error: '',
+        fileTree: newFileTree,
       };
     }
 
@@ -196,6 +201,7 @@ export default function reducer(state = initialState, action: Actions): State {
 
 export function deleteFile(data: DeleteFileRequest): DeleteFile {
   return {
+    fileId: data.fileId,
     type: DELETE_FILE,
     payload: {
       request: {
@@ -241,4 +247,39 @@ export function getFileTree(): GetFileTree {
       },
     },
   };
+}
+
+// selectors and helpers
+
+/**
+ * Receiveis a FileTreeItem and a fileIdToFilter and returns recursively
+ * each children with that id filtered.
+ */
+export function filterFileTreeItemById(ft: FileTreeItem, fileIdToFilter: number): FileTreeItem {
+  if (ft.children) {
+    ft.children = ft.children?.filter((f) => (f.isDirectory ? f : f.id !== fileIdToFilter));
+
+    ft.children = ft.children.map((f) => filterFileTreeItemById(f, fileIdToFilter));
+  }
+
+  return ft;
+}
+
+/**
+ * Returns an array of all ids in a FileTree as strings.
+ */
+export function selectAllFileTreeIds(state: State): string[] {
+  const ids: string[] = [];
+
+  function pushIds(ft: FileTreeItem) {
+    ids.push(String(ft.id));
+
+    if (ft.children) {
+      ft.children.forEach(pushIds);
+    }
+  }
+
+  state.fileTree.forEach(pushIds);
+
+  return ids;
 }
