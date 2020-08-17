@@ -1,5 +1,13 @@
 import { ActionPayload, BaseErrorResponse } from 'app/Store/Models/ReduxModels';
-import { DeleteFileRequest, File, FileTreeItem, FileUpdateRequest, FileUpdateResponse, GetFileRequest } from './models';
+import {
+  DeleteFileRequest,
+  File,
+  FileTreeItem,
+  FileUpdateRequest,
+  FileUpdateResponse,
+  GetFileRequest,
+  SetOnlineEditorDataRequest,
+} from './models';
 
 export const DELETE_FILE = 'DELETE_FILE';
 export const DELETE_FILE_FAILURE = 'DELETE_FILE_FAILURE';
@@ -16,6 +24,8 @@ export const GET_FILE_SUCCESS = 'GET_FILE_SUCCESS';
 export const GET_FILETREE = 'GET_FILETREE';
 export const GET_FILETREE_FAILURE = 'GET_FILETREE_FAILURE';
 export const GET_FILETREE_SUCCESS = 'GET_FILETREE_SUCCESS';
+
+export const SET_ONLINE_EDITOR_DATA = 'SET_ONLINE_EDITOR_DATA';
 
 export interface DeleteFile {
   fileId: number;
@@ -70,6 +80,11 @@ export interface GetFileTreeSuccess {
   payload: FileTreeItem[];
 }
 
+export interface SetOnlineEditorData {
+  type: typeof SET_ONLINE_EDITOR_DATA;
+  payload: SetOnlineEditorDataRequest;
+}
+
 export type Actions =
   | DeleteFile
   | DeleteFileFailure
@@ -82,13 +97,16 @@ export type Actions =
   | GetFileSuccess
   | GetFileTree
   | GetFileTreeFailure
-  | GetFileTreeSuccess;
+  | GetFileTreeSuccess
+  | SetOnlineEditorData;
 
 export interface State {
   loading: boolean;
   error: string;
   file: File;
   fileTree: FileTreeItem[];
+  fileDeleted: boolean;
+  fileUpdated: boolean;
 }
 
 const initialState: State = {
@@ -100,6 +118,8 @@ const initialState: State = {
     name: '',
   },
   fileTree: [],
+  fileDeleted: false,
+  fileUpdated: false,
 };
 
 export default function reducer(state = initialState, action: Actions): State {
@@ -125,6 +145,7 @@ export default function reducer(state = initialState, action: Actions): State {
         loading: false,
         error: '',
         fileTree: newFileTree,
+        fileDeleted: true,
       };
     }
 
@@ -146,6 +167,7 @@ export default function reducer(state = initialState, action: Actions): State {
         ...state,
         loading: false,
         error: '',
+        fileUpdated: true,
       };
     }
 
@@ -174,22 +196,26 @@ export default function reducer(state = initialState, action: Actions): State {
     case GET_FILE: {
       return {
         ...state,
-        loading: true,
       };
     }
     case GET_FILE_FAILURE: {
       return {
         ...state,
-        loading: false,
         error: 'Não foi possível carregar o arquivo',
       };
     }
     case GET_FILE_SUCCESS: {
       return {
         ...state,
-        loading: false,
         error: '',
         file: action.payload,
+      };
+    }
+
+    case SET_ONLINE_EDITOR_DATA: {
+      return {
+        ...state,
+        ...action.payload,
       };
     }
 
@@ -246,6 +272,12 @@ export function getFileTree(): GetFileTree {
         url: '/filetree',
       },
     },
+  };
+}
+export function setOnlineEditorData(data: SetOnlineEditorDataRequest): SetOnlineEditorData {
+  return {
+    type: SET_ONLINE_EDITOR_DATA,
+    payload: data,
   };
 }
 

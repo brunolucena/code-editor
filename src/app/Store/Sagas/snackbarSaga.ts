@@ -2,21 +2,16 @@ import { put, takeLatest } from 'redux-saga/effects';
 import { Action } from '../Models/ReduxModels';
 
 import { OPEN_SNACKBAR, OpenSnackbar } from '../Ducks/snackbarDuck';
-import { GET_FILETREE_FAILURE, DELETE_FILE_FAILURE, FILE_UPDATE_FAILURE, GET_FILE_FAILURE } from '../Ducks/onlineEditorDuck';
+import {
+  DELETE_FILE_FAILURE,
+  FILE_UPDATE_FAILURE,
+  FILE_UPDATE_SUCCESS,
+  GET_FILETREE_FAILURE,
+  GET_FILE_FAILURE,
+} from '../Ducks/onlineEditorDuck';
 
-// retorna uma mensagem de acordo com o TYPE da action que deu erro
-// declarada no getAllFailuresSaga
+// returns a message for the redux TYPE that was dispatched
 function getFailureMessage(type: string): string {
-  switch (type) {
-    default: {
-      return 'Ocorreu um erro. Por favor tente novamente.';
-    }
-  }
-}
-
-// retorna uma mensagem de acordo com o TYPE da action que deu sucesso
-// declarada no getAllSuccessSaga
-function getSuccessMessage(type: string): string {
   switch (type) {
     case DELETE_FILE_FAILURE: {
       return 'Não foi possível excluir o arquivo';
@@ -35,12 +30,24 @@ function getSuccessMessage(type: string): string {
     }
 
     default: {
+      return 'Ocorreu um erro. Por favor tente novamente.';
+    }
+  }
+}
+
+// returns a message for the redux TYPE that was dispatched
+function getSuccessMessage(type: string): string {
+  switch (type) {
+    case FILE_UPDATE_SUCCESS: {
+      return 'Arquivo salvo com sucesso!';
+    }
+
+    default: {
       return 'Informações salvas com sucesso';
     }
   }
 }
 
-// trata os errors das TYPEs declaradas no takeLatest do export default
 export function* getAllFailuresSaga(action: any) {
   try {
     const data: OpenSnackbar = {
@@ -57,7 +64,6 @@ export function* getAllFailuresSaga(action: any) {
   }
 }
 
-// trata os success das TYPEs declaradas no takeLatest do export default
 export function* getAllSuccessSaga(action: Action<any>) {
   try {
     const data: OpenSnackbar = {
@@ -76,5 +82,5 @@ export function* getAllSuccessSaga(action: Action<any>) {
 
 export default [
   takeLatest([DELETE_FILE_FAILURE, FILE_UPDATE_FAILURE, GET_FILE_FAILURE, GET_FILETREE_FAILURE], getAllFailuresSaga),
-  takeLatest([], getAllSuccessSaga),
+  takeLatest([FILE_UPDATE_SUCCESS], getAllSuccessSaga),
 ];

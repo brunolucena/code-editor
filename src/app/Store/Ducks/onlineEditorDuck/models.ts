@@ -15,6 +15,15 @@ export interface DeleteFileRequest {
   fileId: number;
 }
 
+export interface SetOnlineEditorDataRequest {
+  loading?: boolean;
+  error?: string;
+  file?: File;
+  fileTree?: FileTreeItem[];
+  fileDeleted?: boolean;
+  fileUpdated?: boolean;
+}
+
 export interface FileTreeItem {
   id: number;
   name: string;

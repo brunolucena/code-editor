@@ -1,0 +1,41 @@
+.file-wrapper {
+  padding-bottom: 100px;
+
+  .CodeMirror {
+    height: auto;
+    background-color: #1e1e1e;
+    color: #bdbdbd;
+
+    .CodeMirror-gutters {
+      background-color: #1e1e1e;
+      color: #6a8585;
+    }
+  }
+
+  .buttons-wrapper {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .button {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 5px;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+
+    &.button-save {
+      background-color: #73c991;
+    }
+
+    &.button-cancel {
+      background-color: #ef5350;
+    }
+  }
+}
