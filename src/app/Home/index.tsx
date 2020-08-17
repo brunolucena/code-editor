@@ -1,5 +1,6 @@
 import React from 'react';
 import '../../../node_modules/codemirror/lib/codemirror.css';
+import '../../../node_modules/codemirror/theme/material.css';
 
 import './styles.scss';
 

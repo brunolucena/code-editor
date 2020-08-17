@@ -71,6 +71,7 @@ function FileView() {
           lineNumbers: true,
           spellcheck: true,
           pasteLinesPerSelection: true,
+          theme: 'material',
         }}
         onBeforeChange={(editor, data, value) => {
           setHasChanges(true);

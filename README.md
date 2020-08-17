@@ -1,3 +1,9 @@
+See [demo](http://veezoo-assignment-bruno-lucena.surge.sh/).
+
+The TreeView is based on [MaterialUI Treeview](https://material-ui.com/components/tree-view/#customized-tree-view).
+
+The code-editor is based on [react-codemirror2](https://github.com/scniro/react-codemirror2).
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
